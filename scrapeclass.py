@@ -6,6 +6,7 @@ import re
 courseHome = 'https://instruction.gwinnett.k12.ga.us/d2l/lp/ouHome/defaultHome.d2l'
 eclassBase = 'https://apps.gwinnett.k12.ga.us/'
 
+#{{{ parse_dash
 def parse_dash(x):
   tempDict = {}
   soup = BeautifulSoup(x, 'html.parser')
@@ -21,7 +22,9 @@ def parse_dash(x):
         tempDict[classId] = {'name' : d.span.get_text(), 'cGrade' : d.span.next_sibling.get_text(),
                              'link' : str(e)}
   return tempDict
+#}}}
 
+#{{{ parseClass
 def parseClass(x):
   gradeList = []
   soup = BeautifulSoup(x, 'html.parser')
@@ -35,7 +38,9 @@ def parseClass(x):
         tempList.append(td.get_text())
       gradeList.append(tempList)
   return gradeList
+#}}}
   
+#{{{refreshGrades
 def refreshGrades(k):
   eclassDashboard = eclassBase + 'dca/student/dashboard'
   eclassLogin     = eclassBase + 'pkmslogin.form'
@@ -50,6 +55,7 @@ def refreshGrades(k):
       f = c.get(eclassUrl + d[e]['link'])
       with open("%s_%s.html" % (k,e), "w") as of:
         of.write(f.content)
+#}}}
 
 logins = []
 with open('kids', 'r') as f:
