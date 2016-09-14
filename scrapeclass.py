@@ -1,10 +1,34 @@
 #!/usr/bin/python
+import optparse
 from requests import session
 from bs4 import BeautifulSoup
 import re
 
 courseHome = 'https://instruction.gwinnett.k12.ga.us/d2l/lp/ouHome/defaultHome.d2l'
 eclassBase = 'https://apps.gwinnett.k12.ga.us/'
+
+#{{{ config options
+usage = "%prog [-c file] [-s] [-f]"
+parser = optparse.OptionParser(usage)
+parser.add_option("-c", "--config",
+                dest="config",
+                type="string",
+                action="store",
+                metavar="CONFIG",
+                help="points to config file instead of using ~/.scrapeclass_config.py")
+parser.add_option("-f", "--file",
+                dest="file",
+                type="string",
+                action="store",
+                metavar="FILE",
+                help="reads previously created html file with -s instead of making a web call")
+parser.add_option("-s", "--save",
+                dest="save",
+                action="store_true",
+                default=False,
+                help="saves the dashboard to an html file")
+(options, args) = parser.parse_args()
+#}}}
 
 #{{{ parse_dash
 def parse_dash(x):
