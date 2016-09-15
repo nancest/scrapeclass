@@ -30,8 +30,8 @@ parser.add_option("-s", "--save",
 (options, args) = parser.parse_args()
 #}}}
 
-#{{{ parse_dash
-def parse_dash(x):
+#{{{ parseDash
+def parseDash(x):
   tempDict = {}
   soup = BeautifulSoup(x, 'html.parser')
   a = soup.find(id='grades')
@@ -71,10 +71,10 @@ def refreshGrades(k):
   eclassUrl       = eclassBase + 'dca/student/'
   with session() as c:
     c.post(eclassLogin,data=logins[k])
-    dash_page = c.get(eclassDashboard)
+    dashPage = c.get(eclassDashboard)
     with open("%s_dashboard.html" % (kid), "w") as of:
-      of.write(dash_page.content)
-    d = parse_dash(dash_page.content)
+      of.write(dashPage.content)
+    d = parseDash(dashPage.content)
     for e in d:
       f = c.get(eclassUrl + d[e]['link'])
       with open("%s_%s.html" % (k,e), "w") as of:
@@ -89,7 +89,7 @@ for kid in sorted(logins):
   print kid
   refreshGrades(kid)
   with open("%s_dashboard.html" % (kid)) as f:
-    classDict = parse_dash(str(f.readlines()))
+    classDict = parseDash(str(f.readlines()))
     for indivClass in classDict:
        print '  ' + indivClass + ' - ' + classDict[indivClass]['name'] + ' - ' + classDict[indivClass]['cGrade']
        with open("%s_%s.html" % (kid,indivClass)) as g:
