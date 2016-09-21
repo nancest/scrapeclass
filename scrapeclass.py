@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import sys; sys.dont_write_bytecode = True
 import os,imp
 import re,optparse
 from requests import session
