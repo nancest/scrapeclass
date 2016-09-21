@@ -1,26 +1,26 @@
 #!/usr/bin/python
-import optparse
+import os,imp
+import re,optparse
 from requests import session
 from bs4 import BeautifulSoup
-import re
 
 courseHome = 'https://instruction.gwinnett.k12.ga.us/d2l/lp/ouHome/defaultHome.d2l'
 eclassBase = 'https://apps.gwinnett.k12.ga.us/'
 
-#{{{ config options
+#{{{ command line config options and arguments
 usage = "%prog [-c file] [-s] [-f]"
 parser = optparse.OptionParser(usage)
-parser.add_option("-c", "--config",
-                dest="config",
+parser.add_option("-c", "--conffile",
+                dest="conffile",
                 type="string",
                 action="store",
                 metavar="CONFIG",
                 help="points to config file instead of using ~/.scrapeclass_config.py")
 parser.add_option("-f", "--file",
-                dest="file",
+                dest="cachedfile",
                 type="string",
                 action="store",
-                metavar="FILE",
+                metavar="CACHEDFILE",
                 help="reads previously created html file with -s instead of making a web call")
 parser.add_option("-s", "--save",
                 dest="save",
@@ -70,7 +70,7 @@ def refreshGrades(k):
   eclassLogin     = eclassBase + 'pkmslogin.form'
   eclassUrl       = eclassBase + 'dca/student/'
   with session() as c:
-    c.post(eclassLogin,data=logins[k])
+    c.post(eclassLogin,data=config.logins[k])
     dashPage = c.get(eclassDashboard)
     with open("%s_dashboard.html" % (kid), "w") as of:
       of.write(dashPage.content)
@@ -81,11 +81,12 @@ def refreshGrades(k):
         of.write(f.content)
 #}}}
 
-logins = []
-with open('kids', 'r') as f:
-  logins = eval(f.read())
+if options.conffile:
+  config = imp.load_source('config',options.conffile)
+else:
+  config = imp.load_source('config',os.path.expanduser('~/.scrapeclass_config.py'))
 
-for kid in sorted(logins):
+for kid in sorted(config.logins):
   print kid
   refreshGrades(kid)
   with open("%s_dashboard.html" % (kid)) as f:

@@ -1,13 +1,11 @@
 # scrapeclass
 eClass web scraper
 
-Requires a config file with the following format
-
-{
-  ‘firstchild':{ 'login-form-type': 'pwd', 'username': ‘ECLASSID', 'password': 'learnGRADE'},
-  
-  ’secondchild':{ 'login-form-type': 'pwd', 'username': 'ECLASSID', 'password': 'learnGRADE'},
-  
-  ’thirdchid':{ 'login-form-type': 'pwd', 'username': 'ECLASSID', 'password': 'learnGRADE'}
-  
- }
+Requires a config file, '~/.scrapeclass_config.py', with the following format
+'''
+logins = {
+  ‘firstchild':{ 'login-form-type': 'pwd', 'username': ‘firstECLASSID', 'password': 'firstPASSWORD'},
+  ’secondchild':{ 'login-form-type': 'pwd', 'username': 'secondECLASSID', 'password': 'secondPASSWORD'},
+  ’thirdchid':{ 'login-form-type': 'pwd', 'username': 'thirdECLASSID', 'password': 'thirdPASSWORD'}
+}
+'''
