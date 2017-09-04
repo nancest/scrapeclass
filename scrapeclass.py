@@ -5,7 +5,9 @@ import re,optparse
 from requests import session
 from bs4 import BeautifulSoup
 
-courseHome = 'https://instruction.gwinnett.k12.ga.us/d2l/lp/ouHome/defaultHome.d2l'
+# i don't think this variable is needed any longer
+#courseHome = 'https://instruction.gwinnett.k12.ga.us/d2l/lp/ouHome/defaultHome.d2l'
+#
 eclassBase = 'https://apps.gwinnett.k12.ga.us/'
 
 #{{{ command line config options and arguments
@@ -44,7 +46,9 @@ def parseDash(x):
       f = re.search(r'.+=(\d+)&ts', str(e))
       if f:
         classId = f.group(1)
-        tempDict[classId] = {'name' : d.span.string, 'cGrade' : d.span.next_sibling.next_sibling.string, 'link' : str(e)}
+        tempDict[classId] = {'name' : d.span.string, 
+                             'cGrade' : d.span.next_sibling.next_sibling.string, 
+                             'link' : str(e)}
   return tempDict
 #}}}
 
@@ -92,14 +96,14 @@ for kid in sorted(config.logins):
   with open("%s_dashboard.html" % (kid)) as f:
     classDict = parseDash(str(f.readlines()))
     for indivClass in classDict:
-       print '  ' + indivClass + ' - ' + classDict[indivClass]['name'] + ' - ' + classDict[indivClass]['cGrade']
+       print "%10s %-58s %10s" % (indivClass,
+                                 classDict[indivClass]['name'],
+                                 classDict[indivClass]['cGrade']
+                                )
        with open("%s_%s.html" % (kid,indivClass)) as g:
          grades = parseClass(str(g.readlines()))
-         for items in grades:
-           print '    ',
-           for i in items:
-             print i,
-           print 
+         for (subj,date,grade,avg) in grades:
+           print '     %-39s %8s %15s %7s' % (subj,date,grade,avg)
   print
 
 # vim:set ts=2 sw=2 expandtab:
