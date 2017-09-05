@@ -56,15 +56,40 @@ def parseDash(x):
 def parseClass(x):
   gradeList = []
   soup = BeautifulSoup(x, 'html.parser')
-  tbls = soup.find_all("table", {'class': 'tasks-inner-table'})
-  for tbl in tbls:
-    trs = tbl.find_all("tr")
-    for tr in trs:
-      tempList = []
-      tds = tr.find_all("td")
-      for td in tds:
-        tempList.append(td.get_text())
-      gradeList.append(tempList)
+
+  # the row with the task type/weight is a sibling of the grade table
+  # i'm pulling all the rows from the body
+  gradeTable = soup.find("tbody").find_all("tr", recursive=False)
+
+  # if the rows are not paired, exit
+  if len(gradeTable) % 2 != 0:
+    print "The number of tasks rows do no match the number of grade tables!!"
+    exit()
+
+  # i'm going to parse 2 rows at a time per loop and break on the
+  # even rows
+  rowcntr = 1
+  for element in gradeTable:
+    if rowcntr % 2 != 0:
+
+      tr1List = []
+      for tr1 in element.find_all("td"): 
+        tr1List.append(tr1.get_text())
+
+      tr2List = []
+      for tr2 in element.find_next_sibling().find("table").find_all("tr"):
+        tempList = []
+        tds = tr2.find_all("td")
+        for td in tds:
+          tempList.append(td.get_text())
+        tr2List.append(tempList)
+      tr1List.append(tr2List)
+      gradeList.append(tr1List)
+    else:
+      True
+
+    rowcntr += 1
+
   return gradeList
 #}}}
   
@@ -96,14 +121,20 @@ for kid in sorted(config.logins):
   with open("%s_dashboard.html" % (kid)) as f:
     classDict = parseDash(str(f.readlines()))
     for indivClass in classDict:
+       print
        print "%10s %-58s %10s" % (indivClass,
                                  classDict[indivClass]['name'],
                                  classDict[indivClass]['cGrade']
                                 )
+       print "  =============================================================================="
        with open("%s_%s.html" % (kid,indivClass)) as g:
          grades = parseClass(str(g.readlines()))
-         for (subj,date,grade,avg) in grades:
-           print '     %-39s %8s %15s %7s' % (subj,date,grade,avg)
+         for (task,weight,gradeList) in grades:
+           print "    -------------------------------------------------------------------------   "
+           print '    %-60s%7s' % (task,weight)
+           print "    -------------------------------------------------------------------------   "
+           for (subj,date,grade,avg) in gradeList:
+             print '     %-39s %8s %15s %7s' % (subj,date,grade,avg)
   print
 
 # vim:set ts=2 sw=2 expandtab:
