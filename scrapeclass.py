@@ -46,7 +46,7 @@ def parseDash(x):
       f = re.search(r'.+=(\d+)&ts', str(e))
       if f:
         classId = f.group(1)
-        tempDict[classId] = {'name' : d.span.string, 
+        tempDict[classId] = {'name' : d.span.text, 
                              'cGrade' : d.span.next_sibling.next_sibling.string, 
                              'link' : str(e)}
   return tempDict
